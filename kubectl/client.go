@@ -25,6 +25,10 @@ func ConnectK8s() {
 }
 
 func GetExternalIP() string {
+	if Clientset == nil {
+		ConnectK8s()
+	}
+
 	services, err := Clientset.CoreV1().Services("kube-system").List(context.TODO(), metav1.ListOptions{
 		FieldSelector: "metadata.name=traefik",
 	})
