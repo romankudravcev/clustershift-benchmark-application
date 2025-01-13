@@ -7,8 +7,8 @@ import (
 
 func SaveMessage(message *models.Message) (int64, error) {
 	query := `
-        INSERT INTO messages (message, request_ip, processing_ip)
-        VALUES ($1, $2, $3)
+        INSERT INTO messages (content, created_at)
+        VALUES ($1, $2)
         RETURNING id`
 
 	var messageID int64
@@ -27,7 +27,7 @@ func SaveMessage(message *models.Message) (int64, error) {
 
 func GetMessage(id int64) (*models.Message, error) {
 	query := `
-        SELECT id, message, request_ip, processing_ip
+        SELECT id, content, created_at
         FROM messages
         WHERE id = $1`
 
@@ -51,7 +51,7 @@ func GetMessage(id int64) (*models.Message, error) {
 // Get all messages
 func GetMessages() ([]models.Message, error) {
 	query := `
-        SELECT id, message, request_ip, processing_ip
+        SELECT id, content, created_at
         FROM messages
         ORDER BY id DESC`
 
