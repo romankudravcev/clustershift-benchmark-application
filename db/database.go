@@ -58,7 +58,7 @@ func initializeTables(db *sql.DB) error {
         CREATE TABLE IF NOT EXISTS messages (
             id SERIAL PRIMARY KEY,
             content TEXT NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
             host_ip TEXT NOT NULL
         )
     `)
