@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clustershift-benchmark-config
+  namespace: clustershift
+data:
+  DB_URL: "http://192.168.133.10"
+  DB_PORT: "8080"

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clustershift-benchmark-deployment
+  namespace: clustershift
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clustershift-benchmark-deployment
+  template:
+    metadata:
+      labels:
+        app: clustershift-benchmark-deployment
+    spec:
+      containers:
+        - name: clustershift-benchmark-deployment
+          image: ghcr.io/romankudravcev/clustershift-benchmark:latest
+          env:
+          ports:
+            - containerPort: 1337
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clustershift-benchmark-service
+  namespace: clustershift
+spec:
+  selector:
+    app: clustershift-benchmark-deployment
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 1337
+  type: ClusterIP
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: clustershift-benchmark-ingress-route
+  namespace: clustershift
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/clustershift`)
+      kind: Rule
+      services:
+        - name: clustershift-benchmark-service
+          port: 80
