@@ -7,8 +7,8 @@ import (
 
 func SaveMessage(message *models.Message) (int64, error) {
 	query := `
-        INSERT INTO messages (content, created_at)
-        VALUES ($1, $2)
+        INSERT INTO messages (content, created_at, host_ip)
+        VALUES ($1, $2, $3)
         RETURNING id`
 
 	var messageID int64
@@ -16,6 +16,7 @@ func SaveMessage(message *models.Message) (int64, error) {
 		query,
 		message.Content,
 		message.CreatedAt,
+		message.HostIP,
 	).Scan(&messageID)
 
 	if err != nil {
@@ -27,7 +28,7 @@ func SaveMessage(message *models.Message) (int64, error) {
 
 func GetMessage(id int64) (*models.Message, error) {
 	query := `
-        SELECT id, content, created_at
+        SELECT id, content, created_at, host_ip
         FROM messages
         WHERE id = $1`
 
@@ -36,6 +37,7 @@ func GetMessage(id int64) (*models.Message, error) {
 		&message.ID,
 		&message.Content,
 		&message.CreatedAt,
+		&message.HostIP,
 	)
 
 	if err == sql.ErrNoRows {
@@ -51,7 +53,7 @@ func GetMessage(id int64) (*models.Message, error) {
 // Get all messages
 func GetMessages() ([]models.Message, error) {
 	query := `
-        SELECT id, content, created_at
+        SELECT id, content, created_at, host_ip
         FROM messages
         ORDER BY id DESC`
 
@@ -68,6 +70,7 @@ func GetMessages() ([]models.Message, error) {
 			&msg.ID,
 			&msg.Content,
 			&msg.CreatedAt,
+			&msg.HostIP,
 		)
 		if err != nil {
 			return nil, err

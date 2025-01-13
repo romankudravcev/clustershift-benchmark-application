@@ -2,6 +2,7 @@ package api
 
 import (
 	"benchmarker/db"
+	"benchmarker/kubectl"
 	"benchmarker/models"
 	"net/http"
 	"strconv"
@@ -33,15 +34,16 @@ func PostMessage(c *gin.Context) {
 	message := models.Message{
 		Content:   requestBody.Content,
 		CreatedAt: time.Now().UTC(),
+		HostIP:    kubectl.GetExternalIP(),
 	}
 
-	id, err := db.SaveMessage(&message)
+	_, err := db.SaveMessage(&message)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"id": id})
+	c.JSON(http.StatusOK, message)
 }
 
 func GetMessages(c *gin.Context) {
