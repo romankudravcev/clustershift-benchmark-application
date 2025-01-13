@@ -17,6 +17,31 @@ spec:
         - name: clustershift-benchmark-deployment
           image: ghcr.io/romankudravcev/clustershift-benchmark:latest
           env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: DB_PORT
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: DB_NAME
           ports:
             - containerPort: 1337
 ---
