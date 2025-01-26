@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: clustershift-benchmark-config
-  namespace: clustershift
+  namespace: benchmark
 data:
   DB_HOST: "http://192.168.133.10"
   DB_PORT: "8080"

@@ -1,8 +1,36 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: clustershift-benchmark
+  namespace: benchmark
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: service-reader
+rules:
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: service-reader-binding
+subjects:
+  - kind: ServiceAccount
+    name: clustershift-benchmark
+    namespace: benchmark
+roleRef:
+  kind: ClusterRole
+  name: service-reader
+  apiGroup: rbac.authorization.k8s.io
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: clustershift-benchmark-deployment
-  namespace: clustershift
+  namespace: benchmark
 spec:
   replicas: 1
   selector:
@@ -13,9 +41,10 @@ spec:
       labels:
         app: clustershift-benchmark-deployment
     spec:
+      serviceAccountName: clustershift-benchmark
       containers:
         - name: clustershift-benchmark-deployment
-          image: ghcr.io/romankudravcev/clustershift-benchmark:latest
+          image: ghcr.io/romankudravcev/clustershift-benchmarker:latest
           env:
             - name: DB_HOST
               valueFrom:
@@ -49,7 +78,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: clustershift-benchmark-service
-  namespace: clustershift
+  namespace: benchmark
 spec:
   selector:
     app: clustershift-benchmark-deployment
@@ -59,16 +88,16 @@ spec:
       targetPort: 1337
   type: ClusterIP
 ---
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: clustershift-benchmark-ingress-route
-  namespace: clustershift
+  namespace: benchmark
 spec:
   entryPoints:
     - web
   routes:
-    - match: PathPrefix(`/clustershift`)
+    - match: PathPrefix(`/`)
       kind: Rule
       services:
         - name: clustershift-benchmark-service
