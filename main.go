@@ -10,7 +10,7 @@ func main() {
 	// Connect to DB
 	client, err := db.ConnectDB()
 	if err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
 	}
 	defer client.Close()
 
