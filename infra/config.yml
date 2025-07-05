@@ -9,3 +9,5 @@ data:
   DB_USER: "user"
   DB_PASSWORD: "password"
   DB_NAME: "name"
+  DB_TYPE: "postgres" # or "mongodb"
+  MONGODB_URI: "mongodb://user:password@localhost:27017/dbname"

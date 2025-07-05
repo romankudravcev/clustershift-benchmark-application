@@ -71,6 +71,16 @@ spec:
                 configMapKeyRef:
                   name: clustershift-benchmark-config
                   key: DB_NAME
+            - name: DB_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: DB_TYPE
+            - name: MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: MONGODB_URI
           ports:
             - containerPort: 1337
 ---
