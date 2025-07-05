@@ -22,10 +22,10 @@ func SaveMessage(message *models.Message) (int64, error) {
 		if err != nil {
 			return 0, err
 		}
-		if oid, ok := res.InsertedID.(int64); ok {
-			return oid, nil
+		if oid, ok := res.InsertedID.(bson.ObjectID); ok {
+			return oid.Hex(), nil
 		}
-		return 0, nil // MongoDB's ObjectID is not int64, so return 0
+		return "", nil // MongoDB's ObjectID is not int64, so return an empty string
 	}
 
 	query := `
