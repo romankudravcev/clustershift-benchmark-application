@@ -32,18 +32,18 @@ var (
 	MongoDB *mongo.Database
 )
 
-func ConnectDB() (interface{}, error) {
+func ConnectDB() (interface{}, *mongo.Client, error) {
 	if dbType == "mongodb" {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		db := client.Database(dbName)
 		MongoDB = db
 		log.Println("Connected to MongoDB!")
-		return db, nil
+		return db, client, nil
 	}
 
 	// Connection string
