@@ -1,12 +1,16 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -15,15 +19,33 @@ var (
 	dbUser     = os.Getenv("DB_USER")
 	dbPassword = os.Getenv("DB_PASSWORD")
 	dbName     = os.Getenv("DB_NAME")
+	dbType     = os.Getenv("DB_TYPE")
+	mongoURI   = os.Getenv("MONGODB_URI")
 )
 
 const (
 	TableMessages = "messages"
 )
 
-var DB *sql.DB
+var (
+	DB      *sql.DB
+	MongoDB *mongo.Database
+)
 
-func ConnectDB() (*sql.DB, error) {
+func ConnectDB() (interface{}, error) {
+	if dbType == "mongodb" {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+		if err != nil {
+			return nil, err
+		}
+		db := client.Database(dbName)
+		MongoDB = db
+		log.Println("Connected to MongoDB!")
+		return db, nil
+	}
+
 	// Connection string
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
