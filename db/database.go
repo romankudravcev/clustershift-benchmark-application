@@ -53,13 +53,13 @@ func ConnectDB() (interface{}, *mongo.Client, error) {
 	// Open the connection
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		return nil, fmt.Errorf("error opening database: %v", err)
+		return nil, nil, fmt.Errorf("error opening database: %v", err)
 	}
 
 	// Test the connection
 	err = db.Ping()
 	if err != nil {
-		return nil, fmt.Errorf("error connecting to the database: %v", err)
+		return nil, nil, fmt.Errorf("error connecting to the database: %v", err)
 	}
 
 	log.Println("Connected to PostgreSQL!")
@@ -68,10 +68,10 @@ func ConnectDB() (interface{}, *mongo.Client, error) {
 	// Initialize tables
 	err = initializeTables(db)
 	if err != nil {
-		return nil, fmt.Errorf("error initializing tables: %v", err)
+		return nil, nil, fmt.Errorf("error initializing tables: %v", err)
 	}
 
-	return db, nil
+	return db, nil, nil
 }
 
 func initializeTables(db *sql.DB) error {

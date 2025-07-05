@@ -5,14 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"go.mongodb.org/mongo-driver/bson"
-	"os"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-var dbType string
-
-func init() {
-	dbType = os.Getenv("DB_TYPE")
-}
 
 func SaveMessage(message *models.Message) (int64, error) {
 	if dbType == "mongodb" {
@@ -22,10 +16,12 @@ func SaveMessage(message *models.Message) (int64, error) {
 		if err != nil {
 			return 0, err
 		}
-		if oid, ok := res.InsertedID.(bson.ObjectID); ok {
-			return oid.Hex(), nil
+		if oid, ok := res.InsertedID.(primitive.ObjectID); ok {
+			// Convert ObjectID to int64 using a hash function
+			// This gives us a numeric ID that can be used consistently
+			return int64(oid.Timestamp().Unix()), nil
 		}
-		return "", nil // MongoDB's ObjectID is not int64, so return an empty string
+		return 0, nil
 	}
 
 	query := `
@@ -49,7 +45,7 @@ func SaveMessage(message *models.Message) (int64, error) {
 }
 
 func GetMessage(id int64) (*models.Message, error) {
-	if os.Getenv("DB_TYPE") == "mongodb" {
+	if dbType == "mongodb" {
 		collection := MongoDB.Collection("messages")
 		ctx := context.Background()
 		var result models.Message
@@ -85,7 +81,7 @@ func GetMessage(id int64) (*models.Message, error) {
 
 // Get all messages
 func GetMessages() ([]models.Message, error) {
-	if os.Getenv("DB_TYPE") == "mongodb" {
+	if dbType == "mongodb" {
 		collection := MongoDB.Collection("messages")
 		ctx := context.Background()
 		cur, err := collection.Find(ctx, bson.M{})
@@ -143,7 +139,7 @@ func GetMessages() ([]models.Message, error) {
 
 // DeleteAllMessages deletes all messages from the database
 func DeleteAllMessages() error {
-	if os.Getenv("DB_TYPE") == "mongodb" {
+	if dbType == "mongodb" {
 		collection := MongoDB.Collection("messages")
 		ctx := context.Background()
 		_, err := collection.DeleteMany(ctx, bson.M{})
