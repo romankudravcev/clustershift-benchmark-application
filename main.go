@@ -8,11 +8,15 @@ import (
 
 func main() {
 	// Connect to DB
-	client, err := db.ConnectDB()
+	_, _, err := db.ConnectDB()
 	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer client.Close()
+
+	// Defer close for postgres only
+	if db.DB != nil {
+		defer db.DB.Close()
+	}
 
 	router := api.SetupRouter()
 	if err := router.Run(":1337"); err != nil {
