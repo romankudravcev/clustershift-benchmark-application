@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Connect to DB
-	client, err := db.ConnectDB()
+	_, err := db.ConnectDB()
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
