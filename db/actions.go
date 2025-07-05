@@ -8,8 +8,14 @@ import (
 	"os"
 )
 
+var dbType string
+
+func init() {
+	dbType = os.Getenv("DB_TYPE")
+}
+
 func SaveMessage(message *models.Message) (int64, error) {
-	if os.Getenv("DB_TYPE") == "mongodb" {
+	if dbType == "mongodb" {
 		collection := MongoDB.Collection("messages")
 		ctx := context.Background()
 		res, err := collection.InsertOne(ctx, message)
