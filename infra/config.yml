@@ -4,6 +4,7 @@ metadata:
   name: clustershift-benchmark-config
   namespace: benchmark
 data:
+  HOST_IP: "X.X.X"
   DB_HOST: "http://192.168.133.10"
   DB_PORT: "8080"
   DB_USER: "user"

@@ -2,13 +2,17 @@ package api
 
 import (
 	"benchmarker/db"
-	"benchmarker/kubectl"
 	"benchmarker/models"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	hostIP = os.Getenv("HOST_IP")
 )
 
 func StartBenchmark(c *gin.Context) {
@@ -34,7 +38,7 @@ func PostMessage(c *gin.Context) {
 	message := models.Message{
 		Content:   requestBody.Content,
 		CreatedAt: time.Now().UTC(),
-		HostIP:    kubectl.GetExternalIP(),
+		HostIP:    hostIP,
 	}
 
 	_, err := db.SaveMessage(&message)
