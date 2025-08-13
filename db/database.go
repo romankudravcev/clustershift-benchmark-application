@@ -36,7 +36,16 @@ func ConnectDB() (interface{}, *mongo.Client, error) {
 	if dbType == "mongodb" {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+
+		// Configure MongoDB connection pool options
+		clientOptions := options.Client().ApplyURI(mongoURI)
+		clientOptions.SetMaxPoolSize(25)                         // Maximum number of connections
+		clientOptions.SetMinPoolSize(5)                          // Minimum number of connections
+		clientOptions.SetMaxConnIdleTime(1 * time.Minute)        // Maximum idle time
+		clientOptions.SetConnectTimeout(10 * time.Second)        // Connection timeout
+		clientOptions.SetServerSelectionTimeout(5 * time.Second) // Server selection timeout
+
+		client, err := mongo.Connect(ctx, clientOptions)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -55,6 +64,12 @@ func ConnectDB() (interface{}, *mongo.Client, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("error opening database: %v", err)
 	}
+
+	// Configure connection pool to prevent connection exhaustion
+	db.SetMaxOpenConns(25)                 // Maximum number of open connections
+	db.SetMaxIdleConns(25)                 // Maximum number of idle connections
+	db.SetConnMaxLifetime(5 * time.Minute) // Maximum connection lifetime
+	db.SetConnMaxIdleTime(1 * time.Minute) // Maximum idle time
 
 	// Test the connection
 	err = db.Ping()
@@ -83,6 +98,21 @@ func initializeTables(db *sql.DB) error {
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
             host_ip TEXT NOT NULL
         )
+    `)
+	if err != nil {
+		return err
+	}
+
+	// Add indexes for better query performance
+	_, err = db.Exec(`
+        CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
+    `)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`
+        CREATE INDEX IF NOT EXISTS idx_messages_host_ip ON messages(host_ip);
     `)
 	if err != nil {
 		return err
