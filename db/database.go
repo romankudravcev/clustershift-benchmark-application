@@ -96,7 +96,7 @@ func initializeTables(db *sql.DB) error {
             id SERIAL PRIMARY KEY,
             content TEXT NOT NULL,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            host_ip TEXT NOT NULL
+            host_ip INET
         )
     `)
 	if err != nil {

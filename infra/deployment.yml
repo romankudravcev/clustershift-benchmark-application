@@ -44,7 +44,7 @@ spec:
       serviceAccountName: clustershift-benchmark
       containers:
         - name: clustershift-benchmark-deployment
-          image: ghcr.io/romankudravcev/clustershift-benchmarker:latest
+          image: ghcr.io/romankudravcev/clustershift-benchmark-application:latest
           env:
             - name: DB_HOST
               valueFrom:
