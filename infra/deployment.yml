@@ -46,6 +46,11 @@ spec:
         - name: clustershift-benchmark-deployment
           image: ghcr.io/romankudravcev/clustershift-benchmark-application:latest
           env:
+            - name: HOST_IP
+              valueFrom:
+                configMapKeyRef:
+                  name: clustershift-benchmark-config
+                  key: HOST_IP
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
